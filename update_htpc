@@ -1,0 +1,28 @@
+#!/usr/bin/bash
+YELLOW='\033[0;33m'
+WHITE='\033[0;37m'
+NC='\033[0m' # No Color
+
+function header () {
+  line="++++++++++++++++++++++++++++++++++++++++++++++++++"
+  printf "\n${YELLOW}${line}\n${WHITE}${*}${YELLOW}\n${line}${NC}\n"
+}
+
+function docker_state {
+  header "docker container ls"
+  docker container ls
+}
+
+function docker_pull {
+  header "docker-compose pull"                                                
+  docker-compose pull                                                         
+  header "docker-compose up -d --remove-orphans"                              
+  docker-compose up -d --remove-orphans                                       
+  header "docker image prune"                                                 
+  docker image prune                                                    
+}                                                    
+
+docker_state
+docker_pull
+docker_state
+date > /storage/.lastupdate

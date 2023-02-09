@@ -1,0 +1,69 @@
+#!/usr/bin/bash
+
+# Functions
+function critical () {
+printf "\033[0;101m $1 \033[0m "
+}
+function normal () {
+printf "\033[0;42m $1 \033[0m "
+}
+function inform () {
+printf "\033[0;44m $1 \033[0m "
+}
+
+function cpu_load {
+    load=$(uptime | awk '{print $11}' | cut -f1 -d '.')
+    if [[ "$load" -gt "2" ]]; then
+        critical cpu_load
+        top -b -n 1 | head -10 >> $output 2>&1
+    else
+        normal cpu_load
+    fi
+}
+
+function free_mem {
+    mem=$(free -m | grep Mem | awk '{print $4}')
+    tolerance=100
+    if [[ "$mem" -lt "$tolerance" ]]; then
+        critical free_mem
+        free -mh >> $output 2>&1
+    else
+        normal free_mem
+    fi
+}
+
+function diskusage () {
+    diskusage=$(df /storage | grep -v Filesystem | awk '{print $5}' | cut -f1 -d '%')
+    tolerance=65
+    if [[ "$diskusage" == "$tolerance" ]] ;then
+        critical $1
+        df -h $1 >> $output 2>&1
+    else
+        normal $1
+    fi
+}
+
+function dns {
+    dns=$(nslookup 1.1.1.1 | grep one.one.one.one 2>/dev/null)
+    if [[ "$dns" == "" ]] ;then critical dns ;else normal dns; fi
+}
+
+function gateway {
+    gateway=$(route -n | grep 'UG[ \t]' | awk '{print $2}' 2>/dev/null)
+    if [[ "$gateway" == "" ]] ;then critical gateway; else normal ${gateway}; fi
+}
+
+function wan {
+    ipaddr=$(curl -s http://whatismijnip.nl |cut -d " " -f 5 2>/dev/null)
+    if [[ "$ipaddr" == "" ]] ;then critical internet ;else normal ${ipaddr}; fi
+}
+
+# Execute Funtions from menu
+printf "Health: "
+cpu_load
+free_mem
+diskusage /storage
+gateway
+wan
+dns
+printf "\n"

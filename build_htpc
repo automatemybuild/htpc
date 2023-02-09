@@ -1,0 +1,130 @@
+#!/usr/bin/bash
+# 02/08/2023 - Build LibreELEC with docker-compose (radarr, sonarr, sabnzbd, jellyfin)
+
+#Variables
+timestamp=$(date '+%Y%m%dT%H%M')
+YELLOW='\033[0;33m'                                                             
+WHITE='\033[0;37m'                                                              
+NC='\033[0m' # No Color                                                         
+
+bin_dir=/storage/bin
+media_dir=/storage/data/media
+usenet_dir=/storage/data/usenet  
+github_dir=/storage/github
+appdata_dir=/storage/docker/appdata
+
+#Functions
+function header () {                                                            
+    line="++++++++++++++++++++++++++++++++++++++++++++++++++"
+    echo -e "${YELLOW}${line}\n${WHITE}${*}${YELLOW}\n${line}${NC}"            
+}                                     
+
+function warning () {                                                            
+    echo -e "${YELLOW}warning: ${WHITE}${*}"            
+}                                     
+
+function pull_htpc_installer {
+    header "github pull"
+    warning "Run curl command to pull files to $github_dir/htpc directory before continuing."
+    [[ "$(read -p 'Continue? [Use ctrl^c to exit] '; echo $REPLY)" != [Nn]* ]] && 
+    [ ! -d $github_dir/htpc ] && mkdir -p $github_dir/htpc
+    header $github_dir; ls -l $github_dir/htpc
+}
+
+function create_directories {
+    [ ! -d $media_dir ] && mkdir -p $media_dir/tv $media_dir/movies
+    header $media_dir; ls -l $media_dir
+    [ ! -d $usenet_dir ] && mkdir -p $usenet_dir/complete $usenet_dir/incomplete
+    header $usenet_dir; ls -l $usenet_dir
+    [ ! -d $appdata_dir ] && mkdir -p $appdata_dir/sonarr $appdata_dir/radarr $appdata_dir/sabnzbd $appdata_dir/jellyfin
+    header $appdata_dir; ls -l $appdata_dir
+    [ ! -d $bin_dir ] && mkdir -p $bin_dir
+    header $bin_dir; ls -l $bin_dir
+}
+
+function create_profile {
+    header "> Create or update $bin_dir/.profile"
+    if [ -f $github_dir/htpc/.profile ] ;then
+        [ -f /storage/.profile ] && mv /storage/.profile /storage/.profile.$timestamp
+        cp /storage/github/htpc/.profile /storage/.profile
+        ls -la /storage/.profile*
+    else
+        warning "No change .profile in $github_dir/htpc not found"
+        echo "Creating .profile with PATH needed for docker-compose"
+	printf "PATH=\$HOME/bin:\$PATH\nalias ll='ls -alF'\n" > /storage/.profile
+    fi
+}
+
+function sync_bin_files {
+    header "> Sync bin *_htpc from $github_dir/htpc"
+    cd /storage/github/htpc
+    for i in $(ls -1 | grep _htpc); do
+            [ -f $bin_dir/$i ] && mv $bin_dir/$i $bin_dir/$i.$timestamp
+            echo "Adding: $i"
+            cp $i $bin_dir
+            chmod +x $bin_dir/$i
+    done
+}
+
+function create_nfs_mounts {
+    header "> Create NFS mounts"
+    cd /storage/github/htpc
+    for i in $(ls -1 | grep mount); do
+        echo "Found: $i"
+        if [ ! -f /storage/.config/system.d/$i ] ;then
+            echo $i
+            cp $i /storage/.config/system.d/
+            dir=$(grep Where $i | awk -F "=" '{print $2}')
+            [ ! -d $dir ] && mkdir -p $dir
+            systemctl start $i
+            ls -l $dir
+            warning "If list above does not match NAS files Confirm NFS permissions at source for `hostname`"
+            header "Backout commands if needed"
+            echo "systemctl disable $i; rm /storage/.config/system.d/$i rm -rf /storage/$dir; systemctrl daemon-reload"
+            [[ "$(read -p 'systemctl enable service - Continue? '; echo $REPLY)" != [Nn]* ]] && 
+            systemctl enable $i
+            header "Added: systemctl status $i"; systemctl status $i | grep -v ~
+        else
+            warning "Nothing added $i already present in /storage/.config/sytem.d directory"
+            header "Existing: systemctl status $i"; systemctl status $i | grep -v ~
+        fi
+    done
+}
+
+function install_docker_compose {
+    header "> Install docker_compose"
+    if [ -f $github_dir/htpc/docker-compose.yml ] ;then
+        [ -f /storage/docker-compose.yml ] && mv /storage/docker-compose.yml /storage/docker-compose.yml.$timestamp
+        cp $github_dir/htpc/docker-compose.yml /storage
+        ls -l /storage/docker-compose.yml*
+        header "> ***Manual add-on install required***"
+        warning "From LibreELEC GUI install docker add-on before proceeding!"
+        [[ "$(read -p 'Docker add-on installed? Continue? '; echo $REPLY)" != [Nn]* ]] && 
+        header "source /storage/.profile"; source /storage/.profile
+        echo "PATH=$PATH"
+        header "> linuxserver/docker-docker-compose pull"
+        curl -L --fail https://raw.githubusercontent.com/linuxserver/docker-docker-compose/master/run.sh -o $bin_dir/docker-compose
+        chmod +x $bin_dir/docker-compose
+        header "docker-compose --version"; docker-compose --version
+        warning "Success if you see the version"
+        [[ "$(read -p 'Start docker-compose? - Continue? '; echo $REPLY)" != [Nn]* ]] && 
+        header "> docker-compose up (pulls images)"                                                
+        docker-compose down
+        docker-compose up -d
+        header "> Reboot needed"
+        [[ "$(read -p 'Continue? '; echo $REPLY)" != [Nn]* ]] && 
+	header "> systemctl reboot in progess..."
+        systemctl reboot
+    else
+        warning "No docker-compose.yml file in $github_dir\n\n"
+    fi
+}
+
+#Run Functions
+pull_htpc_installer
+create_directories
+sync_bin_files
+create_profile
+create_nfs_mounts
+install_docker_compose
+
