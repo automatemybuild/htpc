@@ -1,0 +1,33 @@
+#!/usr/bin/bash
+# 02/09/2023 - Created
+
+bkup=/storage/bkup
+tarfile="/storage/`hostname -s`_htpc_`date '+%y%m%d'`.tar.gz"
+nas_backup=/storage/backup/htpc/
+nas_backup_dir=/storage/backup/htpc/`hostname`
+
+#Prepare local directory
+[ -d $bkup.old ] && printf "> Removing $bkup.old\n" && rm -fr $bkup.old
+[ -d $bkup ] && printf "> Moving $bkup $bkup.old\n" && mv $bkup $bkup.old
+[ ! -d $bkup ] && printf "> Creating $bkup directories\n" && \
+mkdir -p $bkup/bin $bkup/home $bkup/systemd $bkup/github
+
+#Copy files to local directory
+cp -v /storage/bin/* $bkup/bin
+cp -v /storage/.profile* $bkup/home
+cp -v /storage/docker-compose.yml* $bkup/home
+cp -v /storage/.config/system.d/*mount $bkup/systemd
+cp -vr /storage/appdata/* $bkup/appdata
+cp -vr /storage/github $bkup/github
+
+#Create compressed tar file
+printf "> creating tar file $tarfile...\n"
+cd /storage
+[ -f $tarfile ] && printf "> $tarfile exists - removing\n" && rm $tarfile
+tar -czvf $tarfile bkup
+
+#Copy tar file to remote
+[ ! -d $nas_backup ] &&  echo "backup not mounted. Exiting." && exit
+[ ! -d $nas_backup_dir ] && mkdir $nas_backup_dir
+cp -fv $tarfile $nas_backup_dir
+ls -l $nas_backup_dir
