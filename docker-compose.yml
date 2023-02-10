@@ -16,7 +16,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /storage/docker/appdata/radarr:/config
-      - /storage/data:/data
+      - /storage/data/media/movies:/movies
   sonarr:
     container_name: sonarr
     image: cr.hotio.dev/hotio/sonarr:latest
@@ -33,7 +33,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /storage/docker/appdata/sonarr:/config
-      - /storage/data:/tv
+      - /storage/data/media/tv:/tv
   sabnzbd:
     container_name: sabnzbd
     image: cr.hotio.dev/hotio/sabnzbd:latest
@@ -70,3 +70,5 @@ services:
       - /storage/docker/appdata/jellyfin:/config
       - /storage/data/media/tv:/data/tvshows
       - /storage/data/media/movies:/data/movies
+      - /storage/music:/data/music:ro
+      - /storage/pictures:/data/pictures:ro
