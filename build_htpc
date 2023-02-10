@@ -1,7 +1,8 @@
 #!/usr/bin/bash
-# 02/08/2023 - Build LibreELEC with docker-compose (radarr, sonarr, sabnzbd, jellyfin)
+# 02/08/2023 - v.1.00 Build LibreELEC with docker-compose (radarr, sonarr, sabnzbd, jellyfin)
 
 #Variables
+version=1.01
 timestamp=$(date '+%Y%m%dT%H%M')
 YELLOW='\033[0;33m'                                                             
 WHITE='\033[0;37m'                                                              
@@ -46,7 +47,7 @@ function create_profile {
     header "> Create or update $bin_dir/.profile"
     if [ -f $github_dir/htpc/.profile ] ;then
         [ -f /storage/.profile ] && mv /storage/.profile /storage/.profile.$timestamp
-        cp /storage/github/htpc/.profile /storage/.profile
+        cp /storage/github/htpc/profile /storage/.profile
         ls -la /storage/.profile*
     else
         warning "No change .profile in $github_dir/htpc not found"
@@ -111,6 +112,7 @@ function install_docker_compose {
         header "> docker-compose up (pulls images)"                                                
         docker-compose down
         docker-compose up -d
+        echo "`date` ver: $version" > /storage/.build.$timestamp
         header "> Reboot needed"
         [[ "$(read -p 'Continue? '; echo $REPLY)" != [Nn]* ]] && 
 	header "> systemctl reboot in progess..."

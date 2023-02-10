@@ -31,3 +31,5 @@ tar -czvf $tarfile bkup
 [ ! -d $nas_backup_dir ] && mkdir $nas_backup_dir
 cp -fv $tarfile $nas_backup_dir
 ls -l $nas_backup_dir
+
+date > /storage/.lastbackup
