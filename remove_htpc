@@ -1,0 +1,73 @@
+#!/usr/bin/bash
+# 02/10/2023 - Used to remove containers, service mounts, directories, and appdata from build_htpc
+
+#Variables
+YELLOW='\033[0;33m'                                                             
+WHITE='\033[0;37m'                                                              
+NC='\033[0m' # No Color                                                         
+
+#Functions
+function header () {                                                            
+    line="++++++++++++++++++++++++++++++++++++++++++++++++++"
+    echo -e "${YELLOW}${line}\n${WHITE}${*}${YELLOW}\n${line}${NC}"            
+}                                     
+
+function warning () {                                                            
+    echo -e "${YELLOW}warning: ${WHITE}${*}"            
+}                                     
+
+function start_msg {
+    header "*** HTPC REMOVAL ***"
+    warning "Removes all components from builer_htpc"
+    warning "Non-recoverable after this point!"
+    [[ "$(read -p 'Continue? '; echo $REPLY)" != [Nn]* ]] && 
+    echo "Running: backup_htpc"
+    /storage/bin/backup_htpc
+}
+
+function remove_docker_components {
+    header "Remove docker-compose, containers, and images"
+    [[ "$(read -p 'Continue? '; echo $REPLY)" != [Nn]* ]] && 
+    docker-compose down
+    docker-compose kill
+    docker-compose rm
+    docker stop $(docker ps -aq)
+    docker system prune -a --volumes --force
+    #docker rmi $(docker images -q)
+}
+
+function remove_nfs_mounts {
+    header "Stop and remove NFS mounts"
+    [[ "$(read -p 'Continue? '; echo $REPLY)" != [Nn]* ]] && 
+    cd /storage/.config/system.d
+    for i in $(ls -1 | grep storage*mount); do
+        echo "Found: $i"
+        systemctl stop $i
+        systemctl disable $i
+        rm -f $i
+    done
+}
+
+function remove_directories {
+    [[ "$(read -p 'Continue? '; echo $REPLY)" != [Nn]* ]] && 
+    rm -rf /storage/bin
+    rm -rf /storage/docker
+    rm -rf /storage/data/media /storage/data/usenet
+    warning "Not removing /storage/data/nas check to make sure mount is broken and manually remove /storage data"
+    warning "/storage/github/htpc has not been removed"
+    rm /storage/docker-compose.*
+    rm /storage/.last*
+}
+
+function reboot_server {
+    header "Reboot server"
+    [[ "$(read -p 'Continue? '; echo $REPLY)" != [Nn]* ]] && 
+    systemctl reboot
+}
+
+#Run Functions
+start_msg
+remove_docker_components
+remove_nfs_mounts
+remove_directories
+reboot_server

@@ -11,4 +11,4 @@ alias vim='vi'
 [ -f /storage/.lastupdate ] && printf "Last update: `cat /storage/.lastupdate`  "
 [ -f /storage/.lastbackup ] && printf "Last backup: `cat /storage/.lastbackup`"
 printf "\n"
-/storage/bin/health_htpc
+[ -f /storage/bin/health_htpc ] && /storage/bin/health_htpc

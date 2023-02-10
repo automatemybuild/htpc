@@ -1,12 +1,12 @@
 Unit]
-Description=nas_backup nfs mount script
+Description=nas_photos nfs mount script
 Requires=network-online.service
 After=network-online.service
 Before=kodi.service
 
 [Mount]
-What=192.168.1.253:/volume1/backup
-Where=/storage/backup
+What=192.168.1.253:/volume1/photos
+Where=/storage/data/nas/photos
 Options=
 Type=nfs
 

@@ -2,13 +2,14 @@
 # 02/08/2023 - v.1.00 Build LibreELEC with docker-compose (radarr, sonarr, sabnzbd, jellyfin)
 
 #Variables
-version=1.01
+version=1.02
 timestamp=$(date '+%Y%m%dT%H%M')
 YELLOW='\033[0;33m'                                                             
 WHITE='\033[0;37m'                                                              
 NC='\033[0m' # No Color                                                         
 
 bin_dir=/storage/bin
+nas_dir=/stoarge/data/nas
 media_dir=/storage/data/media
 usenet_dir=/storage/data/usenet  
 github_dir=/storage/github
@@ -41,6 +42,8 @@ function pull_htpc_installer {
 }
 
 function create_directories {
+    [ ! -d $nas_dir ] && mkdir -p $nas_dir/photos $nas_dir/music $nas_dir/media
+    header $nas_dir; ls -l $nas_dir
     [ ! -d $media_dir ] && mkdir -p $media_dir/tv $media_dir/movies
     header $media_dir; ls -l $media_dir
     [ ! -d $usenet_dir ] && mkdir -p $usenet_dir/complete $usenet_dir/incomplete
