@@ -24,6 +24,14 @@ function warning () {
     echo -e "${YELLOW}warning: ${WHITE}${*}"            
 }                                     
 
+function start_msg {
+    header "> ***Manual add-on install required***"
+    warning "#1 - From LibreELEC GUI install docker add-on before proceeding!"
+    warning "#2 - Set TimeZone from GUI: Settings> Interface> Regional> Timezone"
+    [[ "$(read -p 'Docker add-on installed? Continue? '; echo $REPLY)" != [Nn]* ]] && 
+    echo
+}
+
 function pull_htpc_installer {
     header "github pull"
     warning "Run curl command to pull files to $github_dir/htpc directory before continuing."
@@ -95,38 +103,56 @@ function create_nfs_mounts {
 function install_docker_compose {
     header "> Install docker_compose"
     if [ -f $github_dir/htpc/docker-compose.yml ] ;then
-        [ -f /storage/docker-compose.yml ] && mv /storage/docker-compose.yml /storage/docker-compose.yml.$timestamp
-        cp $github_dir/htpc/docker-compose.yml /storage
-        ls -l /storage/docker-compose.yml*
-        header "> ***Manual add-on install required***"
-        warning "From LibreELEC GUI install docker add-on before proceeding!"
-        [[ "$(read -p 'Docker add-on installed? Continue? '; echo $REPLY)" != [Nn]* ]] && 
         header "source /storage/.profile"; source /storage/.profile
         echo "PATH=$PATH"
         header "> linuxserver/docker-docker-compose pull"
         curl -L --fail https://raw.githubusercontent.com/linuxserver/docker-docker-compose/master/run.sh -o $bin_dir/docker-compose
         chmod +x $bin_dir/docker-compose
-        header "docker-compose --version"; docker-compose --version
+        header "docker-compose --version (image pull)"; docker-compose --version
         warning "Success if you see the version"
-        [[ "$(read -p 'Start docker-compose? - Continue? '; echo $REPLY)" != [Nn]* ]] && 
-        header "> docker-compose up (pulls images)"                                                
-        docker-compose down
-        docker-compose up -d
-        echo "`date` ver: $version" > /storage/.build.$timestamp
-        header "> Reboot needed"
-        [[ "$(read -p 'Continue? '; echo $REPLY)" != [Nn]* ]] && 
-	header "> systemctl reboot in progess..."
-        systemctl reboot
     else
         warning "No docker-compose.yml file in $github_dir\n\n"
+
     fi
 }
 
+function post_reboot_docker_compose {
+    [[ "$(read -p 'Run docker-compose? - Continue? '; echo $REPLY)" != [Nn]* ]] && 
+    header "> docker-compose up -d (pulls images from yml)"                                                
+    [ -f /storage/docker-compose.yml ] && mv /storage/docker-compose.yml /storage/docker-compose.yml.$timestamp
+    cp $github_dir/htpc/docker-compose.yml /storage
+    ls -l /storage/docker-compose.yml*
+    cd /storage
+    rm /storage/RUN-build_htcp-TO-COMPLETE
+    echo "`date` ver: $version" > /storage/.build.$timestamp
+    docker-compose up -d
+    header "docker-compose ps"; docker-compose ps
+    echo -e "\n\nDone!\n\n"
+}
+
+function reboot_server {
+        header "> Reboot needed"
+        [[ "$(read -p 'Continue? '; echo $REPLY)" != [Nn]* ]] && 
+	header "> systemctl reboot in progess..."
+        echo -e "\n\n\n\n\n"
+        warning "After reboot run /storage/bin/build_htpc to complete the configuration"
+        touch /storage/RUN-build_htcp-TO-COMPLETE
+        systemctl reboot
+}
+
 #Run Functions
-pull_htpc_installer
-create_directories
-sync_bin_files
-create_profile
-create_nfs_mounts
-install_docker_compose
+if [ -f /storage/RUN-build_htcp-TO-COMPLETE ]; then
+    #Part II - Existance of file used to trigger the post boot steps
+    post_reboot_docker_compose
+else 
+    #Part I - Inital configuraiton pre boot steps
+    start_msg
+    pull_htpc_installer
+    create_directories
+    sync_bin_files
+    create_profile
+    create_nfs_mounts
+    install_docker_compose
+    reboot_server
+fi
 
