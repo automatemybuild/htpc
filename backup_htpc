@@ -10,14 +10,14 @@ nas_backup_dir=/storage/backup/htpc/`hostname`
 [ -d $bkup.old ] && printf "> Removing $bkup.old\n" && rm -fr $bkup.old
 [ -d $bkup ] && printf "> Moving $bkup $bkup.old\n" && mv $bkup $bkup.old
 [ ! -d $bkup ] && printf "> Creating $bkup directories\n" && \
-mkdir -p $bkup/bin $bkup/home $bkup/systemd $bkup/github
+mkdir -p $bkup/bin $bkup/home $bkup/systemd $bkup/github $bkup/appdata
 
 #Copy files to local directory
 cp -v /storage/bin/* $bkup/bin
 cp -v /storage/.profile* $bkup/home
 cp -v /storage/docker-compose.yml* $bkup/home
 cp -v /storage/.config/system.d/*mount $bkup/systemd
-cp -vr /storage/appdata/* $bkup/appdata
+cp -vr /storage/docker/appdata/* $bkup/appdata
 cp -vr /storage/github $bkup/github
 
 #Create compressed tar file
