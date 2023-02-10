@@ -22,7 +22,7 @@ function start_msg {
     warning "Non-recoverable after this point!"
     [[ "$(read -p 'Continue? '; echo $REPLY)" != [Nn]* ]] && 
     echo "Running: backup_htpc"
-    /storage/bin/backup_htpc
+    #/storage/bin/backup_htpc
 }
 
 function remove_docker_components {
@@ -38,25 +38,28 @@ function remove_docker_components {
 
 function remove_nfs_mounts {
     header "Stop and remove NFS mounts"
-    [[ "$(read -p 'Continue? '; echo $REPLY)" != [Nn]* ]] && 
     cd /storage/.config/system.d
-    for i in $(ls -1 | grep storage*mount); do
-        echo "Found: $i"
+    for i in $(ls -1 *mount); do
+        echo "Remove: $i"
+        [[ "$(read -p 'Continue? '; echo $REPLY)" != [Nn]* ]] && 
         systemctl stop $i
         systemctl disable $i
-        rm -f $i
+        rm -v /storage/.config/system.d/$i
     done
 }
 
 function remove_directories {
-    [[ "$(read -p 'Continue? '; echo $REPLY)" != [Nn]* ]] && 
-    rm -rf /storage/bin
-    rm -rf /storage/docker
-    rm -rf /storage/data/media /storage/data/usenet
+    header "Removing files and directories"
     warning "Not removing /storage/data/nas check to make sure mount is broken and manually remove /storage data"
     warning "/storage/github/htpc has not been removed"
+    [[ "$(read -p 'Continue? '; echo $REPLY)" != [Nn]* ]] && 
+    rm -rf /storage/bin
+    rm -rf /storage/bkup*
+    rm -rf /storage/docker
+    rm -rf /storage/data/media /storage/data/usenet
     rm /storage/docker-compose.*
     rm /storage/.last*
+    rm /storage/.build*
 }
 
 function reboot_server {
