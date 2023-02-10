@@ -71,5 +71,5 @@ services:
       - /storage/data/media/tv:/data/tvshows
       - /storage/data/media/movies:/data/movies
       - /storage/data/nas/media:/nas/media
-      - /storage/data/nas/media:/nas/music:ro
+      - /storage/data/nas/music:/nas/music:ro
       - /storage/data/nas/photos:/nas/photos:ro
