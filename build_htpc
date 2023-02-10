@@ -3,13 +3,14 @@
 
 #Variables
 version=1.02
+ipaddr=$(ip route show | grep eth | grep src | awk '{print $7}')
 timestamp=$(date '+%Y%m%dT%H%M')
 YELLOW='\033[0;33m'                                                             
 WHITE='\033[0;37m'                                                              
 NC='\033[0m' # No Color                                                         
 
 bin_dir=/storage/bin
-nas_dir=/stoarge/data/nas
+nas_dir=/storage/data/nas
 media_dir=/storage/data/media
 usenet_dir=/storage/data/usenet  
 github_dir=/storage/github
@@ -158,4 +159,9 @@ else
     install_docker_compose
     reboot_server
 fi
-
+echo "
+Radarr http://${ipaddr}:7878
+Sonarr http://${ipaddr}:8989
+SABnzbd http://${ipaddr}:8080
+Jellyfin http://${ipaddr}:8096
+"
