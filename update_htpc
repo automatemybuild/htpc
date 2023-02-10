@@ -9,8 +9,8 @@ function header () {
 }
 
 function docker_state {
-  header "docker container ls"
-  docker container ls
+  header "docker container ps"
+  docker container ps
 }
 
 function docker_pull {
