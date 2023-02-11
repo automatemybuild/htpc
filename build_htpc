@@ -57,7 +57,7 @@ function create_directories {
 
 function create_profile {
     header "> Create or update $bin_dir/.profile"
-    if [ -f $github_dir/htpc/.profile ] ;then
+    if [ -f $github_dir/htpc/profile ] ;then
         [ -f /storage/.profile ] && mv /storage/.profile /storage/.profile.$timestamp
         cp /storage/github/htpc/profile /storage/.profile
         ls -la /storage/.profile*
