@@ -148,6 +148,12 @@ function reboot_server {
 if [ -f /storage/RUN-build_htcp-TO-COMPLETE ]; then
     #Part II - Existance of file used to trigger the post boot steps
     post_reboot_docker_compose
+    echo "
+Radarr http://${ipaddr}:7878
+Sonarr http://${ipaddr}:8989
+SABnzbd http://${ipaddr}:8080
+Jellyfin http://${ipaddr}:8096
+"
 else 
     #Part I - Inital configuraiton pre boot steps
     start_msg
@@ -159,9 +165,3 @@ else
     install_docker_compose
     reboot_server
 fi
-echo "
-Radarr http://${ipaddr}:7878
-Sonarr http://${ipaddr}:8989
-SABnzbd http://${ipaddr}:8080
-Jellyfin http://${ipaddr}:8096
-"
