@@ -1,8 +1,9 @@
 #!/usr/bin/bash
 # 02/08/2023 - v.1.00 Build LibreELEC with docker-compose (radarr, sonarr, sabnzbd, jellyfin)
+# 02/12/2023 - v.1.01 Docker containers permission issue resolved with 1000:100
 
 #Variables
-version=1.02
+version=1.01
 ipaddr=$(ip route show | grep eth | grep src | awk '{print $7}')
 timestamp=$(date '+%Y%m%dT%H%M')
 YELLOW='\033[0;33m'                                                             
@@ -43,13 +44,17 @@ function pull_htpc_installer {
 }
 
 function create_directories {
+    #Docker permissions UID:1000 GID:100. SABnzb fails with UID:Nobody and UID:root is not permitted.
     [ ! -d $nas_dir ] && mkdir -p $nas_dir/photos $nas_dir/music $nas_dir/media
     header $nas_dir; ls -l $nas_dir
     [ ! -d $media_dir ] && mkdir -p $media_dir/tv $media_dir/movies
+    chown -R 1000:100 $media_dir/tv $media_dir/movies
     header $media_dir; ls -l $media_dir
     [ ! -d $usenet_dir ] && mkdir -p $usenet_dir/complete $usenet_dir/incomplete
+    chown -R 1000:100 $usenet_dir
     header $usenet_dir; ls -l $usenet_dir
     [ ! -d $appdata_dir ] && mkdir -p $appdata_dir/sonarr $appdata_dir/radarr $appdata_dir/sabnzbd $appdata_dir/jellyfin
+    chown -R 1000:100 $appdata_dir
     header $appdata_dir; ls -l $appdata_dir
     [ ! -d $bin_dir ] && mkdir -p $bin_dir
     header $bin_dir; ls -l $bin_dir
