@@ -6,6 +6,7 @@ Installation:
   * Install Docker add-on
   * Set Timezone
   * Enable SSH access
+  * Set/enable HTTP kodi access with port 8081 (conflict with sabnzbd)
 2. Logon as the root user
 3. mkdir -p /storage/github/htcp
 4. Copy all files from https://github.com/automatemybuild/htpc to /storage/github/htpc
@@ -48,7 +49,7 @@ https://trash-guides.info/
 * docker-compose ps      <- show running containers under docker-compose
 * docker-compose down    <- stop and kill containers running
 
-2. Odd Condition: Where docker-compose reports Error already running but not under docker-compose
+2. Odd Condition: Where docker-compose reports Error already running but not under docker-compose (steps)
 * docker-compose ps             <- shows no running containers 
 * docker container ls -a        <- list all containers with state (shows running containers)
 * docker stop $(docker ps -aq)  <- stops all containers
