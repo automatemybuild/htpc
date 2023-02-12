@@ -42,14 +42,14 @@ Helpful configuration guides:
 https://trash-guides.info/
 
 
-1. Control Commands: Start/Stop
-* docker-compose up -d   (start and return to command prompt)
-* docker-compose up      (start with logs, ctrl-c to stop/exit)
-* docker-compose ps      (show running containers under compose)
-* docker-compose down    (stop and kill container running)
+1. Control Commands: Start/stop/status
+* docker-compose up -d   <- start and return to command prompt
+* docker-compose up      <- start with logs, ctrl-c to stop/exit
+* docker-compose ps      <- show running containers under compose
+* docker-compose down    <- stop and kill container running
 
-2. Odd Conditions: Where docker-compose reports Error already running not under docker-compose
+2. Odd Condition: Where docker-compose reports Error already running but not under docker-compose
 * docker container ls -1        <- list all containers with state
 * docker stop $(docker ps -aq)  <- stops all containers
 * docker rm $(docker ps -aq)    <- removes all containers 
-* docker-compose up -d          <- start containers under compose
+* docker-compose up -d          <- start containers under docker-compose
