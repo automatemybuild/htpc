@@ -49,7 +49,7 @@ https://trash-guides.info/
 * docker-compose ps      <- show running containers under docker-compose
 * docker-compose down    <- stop and kill containers running
 
-2. Odd Condition: Where docker-compose reports Error already running but not under docker-compose (steps)
+2. Odd Condition: Where docker-compose reports Error already running but not under docker-compose (fix_htpc)
 ERROR: for radarr  Cannot create container for service container: Conflict. The container name "/container" is already in use by container
 * docker-compose ps             <- shows no running containers 
 * docker container ls -a        <- list all containers with state (shows running containers)
