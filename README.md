@@ -1,4 +1,6 @@
 LibreELEC post install automation for docker-compose with containers, mounts, utilites, etc.
+ 
+Tested: Intel NUC (pass), Raspberry Pi 4 (fail, no docker image available)
 
 Installation:
 
