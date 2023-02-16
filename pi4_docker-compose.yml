@@ -1,0 +1,81 @@
+version: "3.2"
+services:
+  radarr:
+    container_name: radarr
+    image: cr.hotio.dev/hotio/radarr:latest
+    restart: unless-stopped
+    logging:
+      driver: json-file
+    network_mode: bridge
+    platform: linux/arm64
+    ports:
+      - 7878:7878
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=America/New_York
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /storage/docker/appdata/radarr:/config
+      - /storage/data/media/movies:/movies
+      - /storage/data/usenet/complete:/data/usenet/complete
+  sonarr:
+    container_name: sonarr
+    image: cr.hotio.dev/hotio/sonarr:latest
+    restart: unless-stopped
+    logging:
+      driver: json-file
+    network_mode: bridge
+    platform: linux/arm64
+    ports:
+      - 8989:8989
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=America/New_York
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /storage/docker/appdata/sonarr:/config
+      - /storage/data/media/tv:/tv
+      - /storage/data/usenet/complete:/data/usenet/complete
+  sabnzbd:
+    container_name: sabnzbd
+    image: cr.hotio.dev/hotio/sabnzbd:latest
+    restart: unless-stopped
+    logging:
+      driver: json-file
+    network_mode: bridge
+    platform: linux/arm64
+    ports:
+      - 8080:8080
+      - 9091:9090
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /storage/docker/appdata/sabnzbd:/config
+      - /storage/data/usenet:/data/usenet
+  jellyfin:
+    container_name: jellyfin
+    image: cr.hotio.dev/hotio/jellyfin:latest
+    restart: unless-stopped
+    logging:
+      driver: json-file
+    network_mode: bridge
+    platform: linux/arm64
+    ports:
+      - 8096:8096
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=America/New_York
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /storage/docker/appdata/jellyfin:/config
+      - /storage/data/media/tv:/data/tvshows
+      - /storage/data/media/movies:/data/movies
+      - /storage/data/nas/media:/nas/media
+      - /storage/data/nas/music:/nas/music:ro
+      - /storage/data/nas/photos:/nas/photos:ro

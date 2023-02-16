@@ -1,9 +1,10 @@
 LibreELEC post install automation for docker-compose with containers, mounts, utilites, etc.
  
-Tested: Intel NUC (pass), Raspberry Pi 4 (fail, no docker image available)
+Tested: Intel NUC (pass, LE10), Raspberry Pi 4 (pass, LE11)
 
 Installation:
 
+0. Backup existing (sonarr, radarr, sabnzbd)
 1. Install LibreELEC
   * Install Docker add-on
   * Set Timezone
@@ -13,6 +14,8 @@ Installation:
 3. mkdir -p /storage/github/htcp
 4. Copy all files from https://github.com/automatemybuild/htpc to /storage/github/htpc
   * chmod +x /storage/github/htcp/build_htpc
+  * Pi4 requires platform: linux/arm64, replace docker-compose.yml
+  * Update docker-compose.yml as needed
 5. NFS mounts
   * Update your NAS volumes you will be mounting to allow LibreELEC IP address 
   * Update/Add/Remove storage-NAME.mount files included. Delete unused. 
