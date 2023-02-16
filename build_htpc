@@ -1,9 +1,10 @@
 #!/usr/bin/bash
 # 02/08/2023 - v.1.00 Build LibreELEC with docker-compose (radarr, sonarr, sabnzbd, jellyfin)
 # 02/12/2023 - v.1.01 Docker containers permission issue resolved with 1000:100
+# 02/16/2023 - v.1.02 Added platform check for processor types
 
 #Variables
-version=1.01
+version=1.02
 ipaddr=$(ip route show | grep eth | grep src | awk '{print $7}')
 timestamp=$(date '+%Y%m%dT%H%M')
 YELLOW='\033[0;33m'                                                             
@@ -129,7 +130,15 @@ function post_reboot_docker_compose {
     [[ "$(read -p 'Run docker-compose? - Continue? '; echo $REPLY)" != [Nn]* ]] && 
     header "> docker-compose up -d (pulls images from yml)"                                                
     [ -f /storage/docker-compose.yml ] && mv /storage/docker-compose.yml /storage/docker-compose.yml.$timestamp
-    cp $github_dir/htpc/docker-compose.yml /storage
+    platform=$(arch)
+    case $platform in
+        aarch64)
+            cp $github_dir/htpc/pi4_docker-compose.yml /storage/docker-compose.yml
+            ;;
+        *)
+            cp $github_dir/htpc/docker-compose.yml /storage
+            ;;
+    esac
     ls -l /storage/docker-compose.yml*
     cd /storage
     rm /storage/RUN-build_htcp-TO-COMPLETE
