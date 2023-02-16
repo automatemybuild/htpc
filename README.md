@@ -14,7 +14,6 @@ Installation:
 3. mkdir -p /storage/github/htcp
 4. Copy all files from https://github.com/automatemybuild/htpc to /storage/github/htpc
   * chmod +x /storage/github/htcp/build_htpc
-  * Pi4 requires platform: linux/arm64, replace docker-compose.yml
   * Update docker-compose.yml as needed
 5. NFS mounts
   * Update your NAS volumes you will be mounting to allow LibreELEC IP address 
@@ -25,7 +24,7 @@ Installation:
   * confirm docker-compose version works
   * continue with reboot
 7. Run /storage/github/htcp/build_htpc to continue
-  * confirm docker-compose started container
+  * Continue. Confirm docker-compose started container
   * Upon future reboots docker-compose should start unless marked down
 
 Links: 
@@ -50,7 +49,7 @@ https://trash-guides.info/
 
 1. Control Commands: Start/stop/status
 * docker-compose up -d   <- start and return to command prompt
-* docker-compose up      <- start with logs, ctrl-c to stop/exit
+* docker-compose up      <- start with logs, ctrl-c to stop/exit (use for dianostics)
 * docker-compose ps      <- show running containers under docker-compose
 * docker-compose down    <- stop and kill containers running
 
