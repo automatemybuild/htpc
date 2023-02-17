@@ -1,5 +1,4 @@
 #!/usr/bin/bash
-# 02/09/2023 - tolerance thresholds not working under LE, false positives
 output=/tmp/health.out
 
 # Functions
