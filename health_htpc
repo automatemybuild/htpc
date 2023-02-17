@@ -1,5 +1,6 @@
 #!/usr/bin/bash
 # 02/09/2023 - tolerance thresholds not working under LE, false positives
+output=/tmp/health.out
 
 # Functions
 function critical () {
@@ -13,7 +14,7 @@ printf "\033[0;44m $1 \033[0m "
 }
 
 function cpu_load {
-    load=$(uptime | awk '{print $11}' | cut -f1 -d '.')
+    load=$(uptime | awk '{print $NF}' | cut -f1 -d '.' |tr -d ' ')
     if [[ "$load" -gt "2" ]]; then
         critical cpu_load
         top -b -n 1 | head -10 >> $output 2>&1
@@ -24,7 +25,7 @@ function cpu_load {
 
 function free_mem {
     mem=$(free -m | grep Mem | awk '{print $4}')
-    tolerance=100
+    tolerance=80
     if [[ "$mem" -lt "$tolerance" ]]; then
         critical free_mem
         free -mh >> $output 2>&1
@@ -60,6 +61,7 @@ function wan {
 }
 
 # Execute Funtions from menu
+[ -f $output ] && rm $output
 printf "Health: "
 cpu_load
 free_mem
@@ -68,3 +70,4 @@ gateway
 wan
 dns
 printf "\n"
+[ -f $output ] && cat $output
