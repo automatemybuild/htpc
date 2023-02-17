@@ -4,7 +4,6 @@ Tested: Intel NUC (pass, LE10), Raspberry Pi 4 (pass, LE11)
 
 Installation:
 
-0. Backup existing (sonarr, radarr, sabnzbd)
 1. Install LibreELEC
   * Enable SSH access
   * Install Docker add-on, setting add-on search docker
@@ -26,26 +25,6 @@ Installation:
 7. Run /storage/github/htcp/build_htpc to continue
   * Continue. Confirm docker-compose started container
   * Upon future reboots docker-compose should start unless marked down
-
-Links: 
-
-Radarr
-http://hostname.domain:7878
-
-Sonarr
-http://hostname.domain:8989
-
-SABnzbd
-http://hostname.domain:8080
-common error: required whitelist entry to allow hostname.domain
-
-Jellyfin
-http://hostname.domain:8096
-
-
-Helpful configuration guides:
-https://trash-guides.info/
-
 
 1. Control Commands: Start/stop/status
 * docker-compose up -d   <- start and return to command prompt
