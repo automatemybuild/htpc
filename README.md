@@ -6,9 +6,9 @@ Installation:
 
 0. Backup existing (sonarr, radarr, sabnzbd)
 1. Install LibreELEC
-  * Install Docker add-on
-  * Set Timezone
   * Enable SSH access
+  * Install Docker add-on, setting add-on search docker
+  * Set Timezone
   * Set/enable HTTP kodi access with port 8081 (conflict with sabnzbd)
 2. Logon as the root user
 3. mkdir -p /storage/github/htcp
@@ -60,3 +60,12 @@ ERROR: for radarr  Cannot create container for service container: Conflict. The 
 * docker stop $(docker ps -aq)  <- stops all containers
 * docker rm $(docker ps -aq)    <- removes all containers 
 * docker-compose up -d          <- start containers under docker-compose
+
+Removal: 
+run remove_htpc
+
+Update Docker images:
+run update_htpc
+
+Rebuild Docker containers:
+run fix_htpc
