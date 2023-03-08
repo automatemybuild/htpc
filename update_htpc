@@ -16,13 +16,41 @@ function docker_state {
 function docker_pull {
   header "docker-compose pull"                                                
   docker-compose pull                                                         
+  header "docker-compose up -d"                              
+  docker-compose up -d 
+}
+
+function docker_clean {
   header "docker-compose up -d --remove-orphans"                              
   docker-compose up -d --remove-orphans                                       
   header "docker image prune"                                                 
   docker image prune                                                    
 }                                                    
 
-docker_state
-docker_pull
-docker_state
-date > /storage/.lastupdate
+while :; do
+  case $1 in
+    -h|--help)
+      echo "$0 [OPTIONS]
+      Options:
+      -c --clean      removes old images not used 
+      -h --help       this help text"
+      exit
+      ;;
+    -c|--clean)
+      docker_state
+      docker_clean
+      docker_state
+      echo "Use the --clean option to remove orphans and older images"
+      exit
+      ;;
+    *)
+      docker_state
+      docker_pull
+      docker_state
+      header "Complete!"
+      date > /storage/.lastupdate
+      exit
+      ;;
+  esac
+done
+
