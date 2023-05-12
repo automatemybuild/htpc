@@ -37,10 +37,7 @@ while :; do
       exit
       ;;
     -c|--clean)
-      docker_state
       docker_clean
-      docker_state
-      echo "Use the --clean option to remove orphans and older images"
       exit
       ;;
     *)
@@ -48,6 +45,7 @@ while :; do
       docker_pull
       docker_state
       header "Complete!"
+      echo "Use the $0 -c|--clean option to remove orphans and older images after validation"
       date > /storage/.lastupdate
       exit
       ;;
